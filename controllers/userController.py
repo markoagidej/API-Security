@@ -19,3 +19,14 @@ def getAll():
     except ValidationError as err:
         return jsonify(err.messages), 400
     
+def login():
+    customer = request.json
+    user = userService.login_customer(customer['username'], customer['password'])
+    if user:
+        return jsonify(user), 200
+    else:
+        resp = {
+            "status": "Error",
+            "message": "User does nto exist"
+        }
+        return jsonify(resp), 404
