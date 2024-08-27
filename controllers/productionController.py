@@ -2,7 +2,9 @@ from flask import request, jsonify
 from models.schemas.productionSchema import production_schema, productions_schema
 from services import productionService
 from marshmallow import ValidationError
+from utils.util import role_required
 
+@role_required('admin')
 def save():
     try:
         production_data = production_schema.load(request.json)

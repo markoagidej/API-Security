@@ -22,8 +22,9 @@ def getAll():
     
 def login_customer(username, password):
     user = (db.session.execute(db.select(User).where(User.username == username, User.password == password)).scalar_one_or_none())
+    role_name = user.role
     if user:
-        auth_token = encode_token(user.id)
+        auth_token = encode_token(user.id, role_name)
         resp = {
             "status": "success",
             "message": "Successfully logged in",

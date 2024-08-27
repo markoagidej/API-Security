@@ -2,6 +2,7 @@ from flask import request, jsonify
 from models.schemas.userSchema import user_schema, users_schema
 from services import userService
 from marshmallow import ValidationError
+from utils.util import role_required
 
 def save():
     try:
@@ -12,6 +13,7 @@ def save():
     user_save = userService.save(user_data)
     return user_schema.jsonify(user_save), 201
 
+@role_required('admin')
 def getAll():
     try:
         users = userService.getAll()
@@ -27,6 +29,6 @@ def login():
     else:
         resp = {
             "status": "Error",
-            "message": "User does nto exist"
+            "message": "User does not exist"
         }
         return jsonify(resp), 404

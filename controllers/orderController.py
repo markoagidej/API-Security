@@ -2,7 +2,9 @@ from flask import request, jsonify
 from models.schemas.orderSchema import order_schema, orders_schema
 from services import orderService
 from marshmallow import ValidationError
+from utils.util import role_required
 
+@role_required('admin')
 def save():
     try:
         order_data = order_schema.load(request.json)

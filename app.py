@@ -2,6 +2,7 @@ from flask import Flask
 from database import db
 from schema import ma
 from limiter import limiter
+from sqlalchemy.orm import Session
 
 from models.customer import Customer
 from models.employee import Employee
@@ -9,6 +10,8 @@ from models.order import Order
 from models.product import Product
 from models.production import Production
 from models.user import User
+from models.role import Role
+from models.userManagementRole import UserManagementRole
 
 from routes.customerBP import customer_blueprint
 from routes.employeeBP import employee_blueprint
@@ -43,13 +46,44 @@ def configure_rate_limit():
     limiter.limit("10/day")(production_blueprint)
     limiter.limit("10/day")(user_blueprint)
 
+def init_users_info_data():
+    with Session(db.engine) as session:
+        with session.begin():
+            users = [
+                User(username="JDoe", password="JDP", role="admin"),
+                User(username="bb", password="bbp", role="user")
+            ]
+            session.add_all(users)
+
+def init_roles_data():
+    with Session(db.engine) as session:
+        with session.begin():
+            roles = [
+                Role(role_name='admin'),
+                Role(role_name='user'),
+                Role(role_name='guest')
+            ]
+            session.add_all(roles)
+
+def init_roles_customers_data():
+    with Session(db.engine) as session:
+        with session.begin():
+            roles_users = [
+                UserManagementRole(user_management_id=1, role_id=1),
+                UserManagementRole(user_management_id=2, role_id=2)
+            ]
+            session.add_all(roles_users)
+
 if __name__ == '__main__':
     app = create_app('DevelopmentConfig')
 
     blueprint_config(app)
 
     with app.app_context():
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
+        init_users_info_data()
+        init_roles_data()
+        init_roles_customers_data()
 
     app.run(debug=True)
